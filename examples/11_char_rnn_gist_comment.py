@@ -64,7 +64,7 @@ def create_model(seq, temp, vocab, hidden=HIDDEN_SIZE):
     output, in_state, out_state = create_rnn(seq, hidden)
     # fully_connected is syntactic sugar for tf.matmul(w, output) + b
     # it will create w and b for us
-    # output is [batchsize, seqlen, hidden], reshape it to logits [batchsize, seqlen, hidden]
+    # output is [batchsize, seqlen, hidden], reshape it to logits [batchsize, seqlen, alphasize]
     logits = tf.contrib.layers.fully_connected(output, len(vocab), None)
     print('output size is {}\n'.format(output.get_shape()))
     print('seq size is {}\n'.format(seq.get_shape()))
