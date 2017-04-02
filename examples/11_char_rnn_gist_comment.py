@@ -11,7 +11,7 @@ import time
 
 import tensorflow as tf
 
-DATA_PATH = '../data/arvix_abstracts.txt'
+DATA_PATH = '/Users/yangwen/Documents/Classes/cs20/tf-stanford-tutorials/data/arvix_abstracts.txt'
 HIDDEN_SIZE = 200
 BATCH_SIZE = 64
 NUM_STEPS = 50
@@ -53,7 +53,7 @@ def create_rnn(seq, hidden_size=HIDDEN_SIZE):
     # all seq are padded to be of the same length which is NUM_STEPS
     length = tf.reduce_sum(tf.reduce_max(tf.sign(seq), 2), 1)
     output, out_state = tf.nn.dynamic_rnn(cell, seq, length, in_state)
-    ## output is [batch size, seqlen, alphasize]
+    ## output is [batch size, seqlen, hidden size]
     ## in state is [batch size, hidden size]
     ## out state is [batch size, hidden size]
     return output, in_state, out_state
@@ -64,8 +64,13 @@ def create_model(seq, temp, vocab, hidden=HIDDEN_SIZE):
     output, in_state, out_state = create_rnn(seq, hidden)
     # fully_connected is syntactic sugar for tf.matmul(w, output) + b
     # it will create w and b for us
-    # also reshape logits to the correct size, [batchsize x seqlen, alphasize]
+    # output is [batchsize, seqlen, hidden], reshape it to logits [batchsize, seqlen, hidden]
     logits = tf.contrib.layers.fully_connected(output, len(vocab), None)
+    print('output size is {}\n'.format(output.get_shape()))
+    print('seq size is {}\n'.format(seq.get_shape()))
+    print('logits size is {}\n'.format(logits.get_shape()))
+    print('in_state is {}\n'.format(in_state.get_shape()))
+    print('out_state is {}\n'.format(out_state.get_shape()))
     loss = tf.reduce_sum(tf.nn.softmax_cross_entropy_with_logits(logits[:, :-1], seq[:, 1:]))
     # sample the next character from Maxwell-Boltzmann Distribution with temperature temp
     # it works equally well without tf.exp
